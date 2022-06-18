@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  db:
+    container_name: postgres_database
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=flask_demo_db
+    volumes:
+      - pg_dat:/var/lib/postgres/data
+
+  pgadmin:
+    container_name: pg_admin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@al-software.com
+      - PGADMIN_DEFAULT_PASSWORD=pgadpass
+      - PGADMIN_LISTEN_PORT=5050
+    ports:
+      - 5050:5050
+    depends_on:
+      - db
+        
+  backend:
+    container_name: flask_demo 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - FLASK_APP=main.py
+    command: >
+      sh -c "python3 -m flask run --host=0.0.0.0"
+    ports:
+      - 5000:5000
+    volumes:
+      - .:/flask-docker
+    depends_on:
+      - db
+
+volumes:
+  pg_dat:
