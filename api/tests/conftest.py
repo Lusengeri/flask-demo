@@ -10,6 +10,6 @@ def app():
     yield app
     clear_app_db(app)
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope='function')
 def client(app):
     return app.test_client()

@@ -8,6 +8,13 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=postgres
       - POSTGRES_DB=flask_demo_db
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "flask_demo_db", "-U", "postgres" ]
+      interval: 60s
+      timeout: 10s
+      retries: 10 
+      start_period: 50s
+
     volumes:
       - pg_dat:/var/lib/postgres/data
 
@@ -22,7 +29,7 @@ services:
       - 5050:5050
     depends_on:
       - db
-        
+
   backend:
     container_name: flask_demo 
     build:
@@ -31,14 +38,21 @@ services:
     restart: always
     environment:
       - FLASK_APP=main.py
-    command: >
-      sh -c "python3 -m flask run --host=0.0.0.0"
+    command: ["python3", "-m", "flask", "run", "--host=0.0.0.0"]
     ports:
       - 5000:5000
     volumes:
       - .:/flask-docker
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
 volumes:
   pg_dat:

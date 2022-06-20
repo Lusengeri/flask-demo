@@ -4,11 +4,12 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 
-from api.routes.users import user_routes
 from api.config import config
+from api.routes.users import user_routes
 from api.utils.api import ma 
-from api.utils.email import mail
 from api.utils.database import db
+from api.utils.email import mail
+from api.utils.observe import metrics 
 from api.utils.responses import response_with 
 import api.utils.responses as resp 
 
@@ -41,10 +42,15 @@ def create_app(user_config=None):
     ma.init_app(app)
     mail.init_app(app)
 
-    @app.route('/')
-    def hello_world():
-        return "Hello, Flask World!"
+    #@app.route('/hello')
+    #def hello_world():
+    #    return "Hello, Flask World!"
 
+    metrics.init_app(app)
+
+    # static information as metric
+    metrics.info('app_info', 'Application info', version='1.0.3')
+    
     return app
 
 def clear_app_db(app):
