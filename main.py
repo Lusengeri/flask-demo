@@ -28,6 +28,10 @@ def create_app(user_config=None):
 
         app.config.from_object(app_config)
 
+    @app.route('/hello')
+    def hello_world():
+        return "Hello, Flask World!"
+
     app.register_blueprint(user_routes, url_prefix='/api/users')
 
     # Initialize Flask extensions
@@ -42,10 +46,7 @@ def create_app(user_config=None):
     ma.init_app(app)
     mail.init_app(app)
 
-    #@app.route('/hello')
-    #def hello_world():
-    #    return "Hello, Flask World!"
-
+    
     metrics.init_app(app)
 
     # static information as metric
