@@ -30,14 +30,17 @@ services:
       - db
 
   backend:
-    container_name: flask_demo 
+    container_name: flask_demo
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
     environment:
       - FLASK_APP=main.py
-    command: ["python3", "-m", "flask", "run", "--host=0.0.0.0"]
+      - FLASK_DEBUG=1
+      - FLASK_RUN_PORT=5000
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    command: ["flask", "run", "--host=0.0.0.0"]
     ports:
       - 5000:5000
     volumes:
